@@ -4,11 +4,10 @@
   <!-- =============== Link & Joint =============== -->
   <!-- Base Footprint -->
 
-    <xacro:arg name="gpu" default="false"/>
-    <xacro:property name="gpu" value="$(arg gpu)" />
+    <!-- <xacro:include filename="$(find sdv_description)/urdf/wheels.xacro" /> -->
+    <xacro:include filename="$(find sdv_description)/urdf/wheels_conrev.xacro" />
 
-    <xacro:include filename="$(find sdv_description)/urdf/wheels_sdv.xacro" />
-    <xacro:include filename="$(find sdv_description)/urdf/VLP-32.xacro"/>
+
 
       <!--  BASE FOOTPRINT  -->
   <link name="base_footprint"/>
@@ -113,7 +112,7 @@
     <mu2 value="0.05"/>
   </gazebo>
 
-  <!-- =============== Ackermann =============== -->
+
   <gazebo>
 
     <plugin name="gazebo_ros_ackermann_drive" filename="libgazebo_ros_ackermann_drive.so">
@@ -168,43 +167,61 @@
 
   </gazebo>
 
-  <!-- =============== Velodyne =============== -->
-  <xacro:VLP-16 parent="base_link" name="velodyne" topic="/points_raw" hz="10" samples="440" gpu="${gpu}"/>
 
-  <joint name="imu_joint" type="fixed">
-    <origin rpy="0 3.141592653589793 0" xyz="0 0 -0.297322"/>
-    <parent link="base_link"/>
-    <child link="imu_link"/>
-  </joint>
-  <link name="imu_link">
 
+  <!-- VELODYNE -->
+  <link name="velodyne_base_link">
     <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.005"/>
-      <inertia ixx="1.67e-8" ixy="0" ixz="0" iyy="1.67e-8" iyz="0" izz="1.67e-8"/>
+      <mass value="0.83"/>
+      <origin xyz="0 0 0.03585"/>
+      <inertia ixx="0.000908059425" ixy="0" ixz="0" iyy="0.000908059425" iyz="0" izz="0.0011049624"/>
     </inertial>
+    <visual>
+      <geometry>
+
+        <mesh filename="file://$(find velodyne_description)/meshes/VLP16_base_1.dae" />
+
+      </geometry>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="file://$(find velodyne_description)/meshes/VLP16_base_2.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.03585"/>
+      <geometry>
+        <cylinder length="0.0717" radius="0.0516"/>
+      </geometry>
+    </collision>
   </link>
 
-  <gazebo reference="imu_link">
-    <gravity>true</gravity>
-    <sensor name="imu_sensor" type="imu">
-      <always_on>true</always_on>
-      <update_rate>200</update_rate>
-      <visualize>true</visualize>
-      <topic>__default_topic__</topic>
-      <pose>0 0 0 0 0 0</pose>
-      <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
-        <topicName>imu_raw</topicName>
-        <update_rate>0</update_rate>
-        <bodyName>imu_link</bodyName>
-        <updateRateHZ>200.0</updateRateHZ>
-        <gaussianNoise>0.0</gaussianNoise>
-        <xyzOffset>0 0 0</xyzOffset>
-        <rpyOffset>0 0 0</rpyOffset>
-        <frameName>base_link</frameName>
-        <initialOrientationAsReference>false</initialOrientationAsReference>
-      </plugin>
-    </sensor>
-  </gazebo>
+
+  <joint name="velodyne_base_mount_joint" type="fixed">
+    <origin rpy="0 3.141592653589793 0" xyz="0 0 1.8"/>
+    <parent link="base_link"/>
+    <child link="velodyne_base_link"/>
+  </joint>
+
+  <joint name="velodyne_base_scan_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.0377"/>
+    <parent link="velodyne_base_link"/>
+    <child link="velodyne"/>
+  </joint>
+  <link name="velodyne">
+    <inertial>
+      <mass value="0.01"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="1e-7" ixy="0" ixz="0" iyy="1e-7" iyz="0" izz="1e-7"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.0377"/>
+      <geometry>
+        <mesh filename="file://$(find velodyne_description)/meshes/VLP16_scan.dae" />
+      </geometry>
+    </visual>
+  </link>
+
+
 
 </robot>
