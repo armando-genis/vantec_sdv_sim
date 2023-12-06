@@ -1,8 +1,10 @@
 import launch
-from launch.substitutions import Command, LaunchConfiguration
-import launch_ros
-import os
+import launch_ros.actions
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess, TimerAction
+from launch.substitutions import Command, LaunchConfiguration
+from launch_ros.substitutions import FindPackageShare
+import os
 
 def generate_launch_description():
     pkg_share = launch_ros.substitutions.FindPackageShare(package='sdv_description').find('sdv_description')
@@ -53,7 +55,7 @@ def generate_launch_description():
         output='screen'
     )
     
-            
+  
     return launch.LaunchDescription([
         
         launch.actions.DeclareLaunchArgument(name='model', default_value=default_model_path,
@@ -70,7 +72,8 @@ def generate_launch_description():
                 spawn_entity,
                 rviz_node,
 
+
             ],
-            period='2.0',  
+            period='4.0',  
         ),
     ])
