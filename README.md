@@ -26,6 +26,8 @@ source /opt/ros/foxy/setup.bash #for ros2 foxy
 source /opt/ros/humble/setup.bash #for ro2 humble
 source install/setup.bash
 ros2 launch sdv_description gazebo.launch.py
+colcon build --symlink-install
+
 ```
 
 ## Run it:
